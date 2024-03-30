@@ -7,15 +7,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import org.jeugenedev.image.OriginalImage;
+import org.jeugenedev.print.*;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -45,6 +44,7 @@ public class PreviewPrintController {
     private GridPane previewScreen;
     @FXML
     private GridPane previewScreenElement;
+    private Preview preview;
 
     @FXML
     void bottomCenterBtnAction(ActionEvent event) {
@@ -120,41 +120,30 @@ public class PreviewPrintController {
 
     @FXML
     void bordersBtnAction(ActionEvent event) {
-        String prevStyle = this.previewScreen.getStyle();
-        if (((CheckBox) event.getSource()).isSelected()) {
-            this.previewScreen.setStyle(prevStyle + "-fx-border-color: black;");
-        } else {
-            this.previewScreen.setStyle(prevStyle + "-fx-border-color: none;");
-        }
+        this.preview = new BordersPreviewViewer(this.preview.getPreview());
+        this.preview.getPreview();
+        ((CheckBox) event.getSource()).setDisable(true);
     }
 
     @FXML
     void dateBtnAction(ActionEvent event) {
-        if (((CheckBox) event.getSource()).isSelected()) {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            previewScreen.addRow(1, new Text(format.format(new Date())));
-        } else {
-            previewScreen.getChildren().remove(1);
-        }
+        this.preview = new DatePreviewViewer(this.preview.getPreview());
+        this.preview.getPreview();
+        ((CheckBox) event.getSource()).setDisable(true);
     }
 
     @FXML
     void fillBtnAction(ActionEvent event) {
-        String prevStyle = this.previewScreen.getStyle();
-        if (((CheckBox) event.getSource()).isSelected()) {
-            this.previewScreen.setStyle(prevStyle + "-fx-background-color: gray;");
-        } else {
-            this.previewScreen.setStyle(prevStyle + "-fx-background-color: transparent;");
-        }
+        this.preview = new FillGrayPreviewViewer(this.preview.getPreview());
+        this.preview.getPreview();
+        ((CheckBox) event.getSource()).setDisable(true);
     }
 
     @FXML
     void marginsBtnAction(ActionEvent event) {
-        if (((CheckBox) event.getSource()).isSelected()) {
-            GridPane.setMargin(this.previewScreenElement, new Insets(20, 10, 20, 30));
-        } else {
-            GridPane.setMargin(this.previewScreenElement, Insets.EMPTY);
-        }
+        this.preview = new MarginsPreviewViewer(this.preview.getPreview());
+        this.preview.getPreview();
+        ((CheckBox) event.getSource()).setDisable(true);
     }
 
     @FXML
@@ -162,6 +151,8 @@ public class PreviewPrintController {
         positionButtons = new RadioButton[]{bottomCenterBtn, bottomLeftBtn, bottomRightBtn,
                 centerCenterBtn, centerLeftBtn, centerRightBtn, topCenterBtn, topLeftBtn, topRightBtn};
         this.centerLeftBtn.setSelected(true);
+
+        this.preview = new PreviewImpl(this.previewScreen);
 
         previewScreen.setOnMouseClicked(event -> {
             FileChooser fileChooser = new FileChooser();
